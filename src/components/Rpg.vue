@@ -28,9 +28,9 @@ export default {
       events: ""
     };
   },
-  created: function() {
-    let result = Service.get("http://localhost:8000/");
-    result.then(e => (this.events = e));
+  created: async function() {
+    let result = await Service.fetch("http://localhost:8000/", "GET", null);
+    this.events = result;
   },
   methods: {
     // getEvents: function() {

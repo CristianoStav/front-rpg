@@ -14,7 +14,7 @@ div {
   height: 150px;
   border-radius: 5px;
 }
-input[type="text"],
+input[type="email"],
 input[type="password"] {
   align-self: center;
   margin: auto;
@@ -36,36 +36,47 @@ input[type="button"] {
 }
 form {
   margin: auto;
-  margin-top: 40px;
+  margin-top: 35px;
+}
+.registrar {
+  margin-top: 35px;
 }
 </style>
 
 <template>
-  <div class="box">
-    <form router-link to="/foo">
-      <p>{{resultado}}</p>
-      <div>
+  <div>
+    <p style="color: red;">{{resultado}}</p>
+    <div class="box">
+      <form router-link to="/foo">
         <div>
-          <label for="login">E-mail:</label>
-          <input type="text" v-model="nome" name="login" id="login" />
+          <div>
+            <label for="login">E-mail:</label>
+            <input type="email" v-model="email" name="login" id="login" />
+          </div>
+          <div>
+            <label for="pass">Senha:</label>
+            <input type="password" v-model="pass" name="pass" id="password" />
+          </div>
+          <input type="button" value="Logar" v-on:click="Logar" />
         </div>
-        <div>
-          <label for="pass">Senha:</label>
-          <input type="password" v-model="pass" name="pass" id="password" />
-        </div>
-        <input type="button" value="Logar" v-on:click="Logar" />
-      </div>
-    </form>
+      </form>
+    </div>
+    <div class="registrar">
+      <p>
+        Não tem uma conta ainda?
+        <router-link to="/login/cadastro">Registre-se</router-link>
+      </p>
+    </div>
   </div>
 </template>
 
 <script>
-/* eslint-disable */
+import Service from "../services/request";
 export default {
   name: "Login",
   data: function() {
     return {
-      nome: "",
+      email: "",
       pass: "",
       resultado: ""
     };
@@ -76,29 +87,26 @@ export default {
     },
     Logar: async function() {
       let usuario = {
-        email: this.nome,
+        email: this.email,
         password: this.pass
       };
 
       if (!usuario.email) return this.al("Digite o nome de usuario");
 
-      let access = await fetch("http://localhost:3001/logar", {
-        method: "POST",
-        body: JSON.stringify(usuario),
-        headers: { "Content-type": "application/json" }
-      }).then(resp => {
-        console.log(resp);
-        return resp.json().then(r => r);
-      });
+      let response = await Service.fetch(
+        "http://localhost:3001/logar",
+        "POST",
+        JSON.stringify(usuario)
+      );
 
-      if (access) {
-        this.al("Olá, Bem-Vindo!");
+      if (response) {
+        this.al(`Olá ${response.name}, Bem-Vindo!`);
         return this.$router.push({
           name: "rpg"
         });
       }
 
-      return this.al("Acesso negado!");
+      return (this.resultado = "Acesso Negado!");
     }
   }
 };

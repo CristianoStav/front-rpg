@@ -39,6 +39,7 @@ input {
 </template>
 
 <script>
+import Service from "../services/request";
 export default {
   name: "cadastro",
   data: () => {
@@ -50,21 +51,18 @@ export default {
     };
   },
   methods: {
-    Cadastrar() {
-      const evento = {
-        name: this.nome,
-        local: this.local,
-        data: this.data
-      };
+    Cadastrar: async function() {
+      const evento = { name: this.nome, local: this.local, data: this.data };
 
-      fetch("http://localhost:8000/cadastrar", {
-        method: "POST",
-        body: JSON.stringify(evento),
-        headers: { "Content-type": "application/json" }
-      }).then(resp => {
-        return resp.json().then(r => (this.resultado = r));
-      });
+      const cadastro = await Service.fetch(
+        "http://localhost:8000/cadastrar",
+        "POST",
+        JSON.stringify(evento)
+      );
+
+      this.resultado = cadastro;
     },
+
     Voltar() {
       return this.$router.push({
         name: "rpg"
